@@ -27,37 +27,36 @@ const projects = ref<Project[]>([])
 // 獲取專案資料
 const fetchProjects = async () => {
   try {
-    const querySnapshot = await getDocs(collection(db, 'projects'));
-    
-    const tempProjects: Project[] = [];
+    const querySnapshot = await getDocs(collection(db, 'projects'))
+
+    const tempProjects: Project[] = []
     querySnapshot.forEach((doc) => {
-      const data = doc.data() as Omit<Project, 'id'>;
+      const data = doc.data() as Omit<Project, 'id'>
       tempProjects.push({
-        id: doc.id, 
-        ...data
-      });
-    });
+        id: doc.id,
+        ...data,
+      })
+    })
 
     // 更新畫面
-    projects.value = tempProjects;
-    console.log('成功抓取資料:', tempProjects);
-
+    projects.value = tempProjects
+    console.log('成功抓取資料:', tempProjects)
   } catch (error) {
-    console.error('抓取資料失敗:', error);
-    alert('連線失敗，請檢查 Console');
+    console.error('抓取資料失敗:', error)
+    alert('連線失敗，請檢查 Console')
   }
-};
+}
 
 onMounted(() => {
-  fetchProjects();
-});
+  fetchProjects()
+})
 
 // 圖表資料
 const chartData = computed<ChartData<'bar'>>(() => {
-  const vueCount = projects.value.filter(p => p.tech.includes('Vue3')).length;
-  const nodeCount = projects.value.filter(p => p.tech.includes('Node.js')).length;
-  const tsCount = projects.value.filter(p => p.tech.includes('TypeScript')).length;
-  const nuxtCount = projects.value.filter(p => p.tech.includes('Nuxt3')).length;
+  const vueCount = projects.value.filter((p) => p.tech.includes('Vue3')).length
+  const nodeCount = projects.value.filter((p) => p.tech.includes('Node.js')).length
+  const tsCount = projects.value.filter((p) => p.tech.includes('TypeScript')).length
+  const nuxtCount = projects.value.filter((p) => p.tech.includes('Nuxt3')).length
 
   return {
     labels: ['Vue3', 'Node.js', 'TypeScript', 'Nuxt3'],
@@ -67,10 +66,10 @@ const chartData = computed<ChartData<'bar'>>(() => {
         backgroundColor: ['#6366f1', '#10b981', '#3b82f6', '#f59e0b'],
         data: [vueCount, nodeCount, tsCount, nuxtCount],
         borderRadius: 4,
-      }
-    ]
-  };
-});
+      },
+    ],
+  }
+})
 
 const chartOptions: ChartOptions<'bar'> = {
   responsive: true,
