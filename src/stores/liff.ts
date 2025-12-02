@@ -23,7 +23,7 @@ export const useLiffStore = defineStore('liff', () => {
 
     try {
       await liff.init({ liffId: import.meta.env.VITE_LIFF_ID })
-      
+
       isInitialized.value = true
       isLoggedIn.value = liff.isLoggedIn()
 
@@ -31,9 +31,8 @@ export const useLiffStore = defineStore('liff', () => {
         await fetchProfile()
       } else {
         // 如果是外部瀏覽器且未登入，這裡可以選擇是否自動跳轉登入頁
-        // liff.login() 
+        // liff.login()
       }
-
     } catch (err: any) {
       console.error('LIFF 初始化失敗:', err)
       error.value = '無法連接 LINE 服務，請稍後再試。'
@@ -48,7 +47,7 @@ export const useLiffStore = defineStore('liff', () => {
         userId: user.userId,
         displayName: user.displayName,
         pictureUrl: user.pictureUrl,
-        statusMessage: user.statusMessage
+        statusMessage: user.statusMessage,
       }
       console.log('LINE Profile:', profile.value)
     } catch (err) {
@@ -59,7 +58,7 @@ export const useLiffStore = defineStore('liff', () => {
   // 登入功能
   const login = () => {
     if (!liff.isLoggedIn()) {
-      liff.login()
+      liff.login({ redirectUri: window.location.href })
     }
   }
 
@@ -80,6 +79,6 @@ export const useLiffStore = defineStore('liff', () => {
     // Actions
     initLiff,
     login,
-    logout
+    logout,
   }
 })

@@ -20,6 +20,11 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: '/liff',
+      name: 'liff',
+      component: () => import('@/views/LiffView.vue'),
+    },
   ],
 })
 
