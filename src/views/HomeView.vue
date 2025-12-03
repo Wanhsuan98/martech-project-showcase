@@ -121,8 +121,8 @@ const chartOptions: ChartOptions<'bar'> = {
   <div class="p-6 space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800">專案總覽</h1>
-        <p class="text-gray-500 mt-1">管理您的所有 MarTech 專案進度。</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">專案總覽</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-1">管理您的所有 MarTech 專案進度。</p>
       </div>
 
       <button
@@ -137,7 +137,7 @@ const chartOptions: ChartOptions<'bar'> = {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <BaseChart :chart-data="chartData" :chart-options="chartOptions" />
       <div
-        class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg p-6 text-white shadow-md flex flex-col justify-between"
+        class="bg-gradient-to-br from-indigo-500 to-purple-600 dark:from-indigo-700 dark:to-purple-800 rounded-lg p-6 text-white shadow-md flex flex-col justify-between"
       >
         <div>
           <h3 class="text-lg font-medium opacity-90">總專案數</h3>
@@ -151,7 +151,7 @@ const chartOptions: ChartOptions<'bar'> = {
       <template #cell-name="{ row }">
         <RouterLink
           :to="{ name: 'project-details', params: { id: row.id } }"
-          class="text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition-colors"
+          class="text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 hover:underline font-medium transition-colors"
         >
           {{ row.name }}
         </RouterLink>
@@ -160,9 +160,12 @@ const chartOptions: ChartOptions<'bar'> = {
         <span
           class="px-3 py-1 rounded-full text-xs font-medium"
           :class="{
-            'bg-green-100 text-green-700': row.status === 'Active',
-            'bg-blue-100 text-blue-700': row.status === 'Completed',
-            'bg-yellow-100 text-yellow-700': row.status === 'Pending',
+            'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300':
+              row.status === 'Active',
+            'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300':
+              row.status === 'Completed',
+            'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300':
+              row.status === 'Pending',
           }"
         >
           {{ row.status }}
@@ -173,32 +176,38 @@ const chartOptions: ChartOptions<'bar'> = {
     <BaseModal :is-open="isModalOpen" title="新增專案" @close="isModalOpen = false">
       <form @submit.prevent="handleAddProject" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">專案名稱</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >專案名稱</label
+          >
           <input
             v-model="form.name"
             type="text"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700"
             placeholder="例如：後台管理系統"
           />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">使用技術</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >使用技術</label
+          >
           <input
             v-model="form.tech"
             type="text"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700"
             placeholder="例如：Vue3, Tailwind"
           />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">目前狀態</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >目前狀態</label
+          >
           <select
             v-model="form.status"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:text-gray-300"
           >
             <option value="Active">進行中 (Active)</option>
             <option value="Pending">排程中 (Pending)</option>
@@ -207,30 +216,34 @@ const chartOptions: ChartOptions<'bar'> = {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">專案描述</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >專案描述</label
+          >
           <textarea
             v-model="form.description"
             rows="4"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none dark:bg-gray-700"
             placeholder="請輸入專案詳細介紹、亮點功能..."
           ></textarea>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">專案截圖連結 (可多張)</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >專案截圖連結 (可多張)</label
+          >
 
           <div class="flex gap-2 mb-2">
             <input
               v-model="tempImageUrl"
               type="url"
-              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700"
               placeholder="https://imgur.com/..."
               @keypress.enter.prevent="addScreenshot"
             />
             <button
               type="button"
               @click="addScreenshot"
-              class="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg hover:bg-gray-200"
+              class="bg-gray-100 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg hover:bg-gray-200 dark:bg-gray-700"
             >
               新增
             </button>
@@ -240,13 +253,13 @@ const chartOptions: ChartOptions<'bar'> = {
             <div
               v-for="(url, index) in form.screenshots"
               :key="index"
-              class="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-100 text-sm"
+              class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-2 rounded border border-gray-100 dark:border-gray-600 text-sm dark:text-gray-300"
             >
               <span class="truncate flex-1 text-gray-600 mr-2">{{ url }}</span>
               <button
                 type="button"
                 @click="removeScreenshot(index)"
-                class="text-red-500 hover:text-red-700"
+                class="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-400"
               >
                 ✕
               </button>
@@ -258,7 +271,7 @@ const chartOptions: ChartOptions<'bar'> = {
           <button
             type="button"
             @click="isModalOpen = false"
-            class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
+            class="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg transition"
           >
             取消
           </button>

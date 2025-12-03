@@ -1,6 +1,4 @@
-/**
- * 基礎彈窗元件
- */
+/** * 基礎彈窗元件 */
 <script setup lang="ts">
 defineProps<{
   isOpen: boolean
@@ -19,7 +17,7 @@ defineEmits(['close'])
       ></div>
 
       <div
-        class="relative bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all"
+        class="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all"
       >
         <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
           <h3 class="text-lg font-bold text-gray-800">{{ title }}</h3>

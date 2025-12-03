@@ -146,7 +146,10 @@ const formatDate = (ts: Timestamp) => {
 
     <div v-else class="space-y-6">
       <div class="flex items-center justify-between">
-        <button @click="router.push('/')" class="text-gray-500 hover:text-indigo-600 transition">
+        <button
+          @click="router.push('/')"
+          class="text-gray-500 dark:text-gray-300 hover:text-indigo-600 transition"
+        >
           ← 返回專案列表
         </button>
 
@@ -187,24 +190,28 @@ const formatDate = (ts: Timestamp) => {
 
       <div
         v-if="isEditing"
-        class="bg-white rounded-2xl shadow-lg border border-indigo-100 p-8 space-y-6"
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-indigo-100 p-8 space-y-6"
       >
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">編輯專案內容</h2>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">編輯專案內容</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">專案名稱</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >專案名稱</label
+            >
             <input
               v-model="editForm.name"
               type="text"
-              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:text-gray-300"
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">狀態</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >狀態</label
+            >
             <select
               v-model="editForm.status"
-              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:text-gray-300"
             >
               <option value="Active">進行中 (Active)</option>
               <option value="Pending">排程中 (Pending)</option>
@@ -214,26 +221,30 @@ const formatDate = (ts: Timestamp) => {
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">使用技術 (逗號分隔)</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >使用技術 (逗號分隔)</label
+          >
           <input
             v-model="editForm.tech"
             type="text"
-            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:text-gray-300"
           />
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">專案描述</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >專案描述</label
+          >
           <textarea
             v-model="editForm.description"
             rows="5"
-            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:text-gray-300"
             placeholder="請輸入詳細描述..."
           ></textarea>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1"
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >專案截圖連結 (Imgur 網址)</label
           >
 
@@ -241,14 +252,14 @@ const formatDate = (ts: Timestamp) => {
             <input
               v-model="tempImageUrl"
               type="url"
-              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none dark:bg-gray-700 dark:text-gray-300"
               placeholder="貼上圖片網址 (https://i.imgur.com/...)"
               @keypress.enter.prevent="addScreenshot"
             />
             <button
               type="button"
               @click="addScreenshot"
-              class="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg hover:bg-gray-200"
+              class="bg-gray-100 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg hover:bg-gray-200 dark:bg-gray-700"
             >
               新增
             </button>
@@ -258,26 +269,29 @@ const formatDate = (ts: Timestamp) => {
             <div
               v-for="(url, index) in editForm.screenshots"
               :key="index"
-              class="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-100 text-sm"
+              class="flex items-center justify-between bg-gray-50 dark:bg-gray-700 p-2 rounded border border-gray-100 dark:border-gray-600 text-sm"
             >
               <a
                 :href="url"
                 target="_blank"
-                class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer hover:bg-gray-200 p-1 rounded transition"
+                class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 p-1 rounded transition"
                 title="點擊預覽圖片"
               >
                 <img
                   :src="url"
                   @error="handleImgError"
-                  class="w-8 h-8 object-cover rounded border bg-white"
+                  class="w-8 h-8 object-cover rounded border bg-white dark:bg-gray-800"
                 />
-                <span class="truncate text-blue-600 underline decoration-blue-300">{{ url }}</span>
+                <span
+                  class="truncate text-blue-600 dark:text-blue-300 underline decoration-blue-300"
+                  >{{ url }}</span
+                >
               </a>
 
               <button
                 type="button"
                 @click="removeScreenshot(index)"
-                class="text-red-500 hover:text-red-700 px-3 py-1 hover:bg-red-50 rounded ml-2 transition"
+                class="text-red-500 dark:text-red-400 hover:text-red-700 px-3 py-1 hover:bg-red-50 rounded ml-2 transition"
                 title="移除此圖片"
               >
                 ✕
@@ -287,8 +301,13 @@ const formatDate = (ts: Timestamp) => {
         </div>
       </div>
 
-      <div v-else class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-        <div class="p-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+      <div
+        v-else
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700"
+      >
+        <div
+          class="p-8 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white dark:from-gray-700 dark:to-gray-800"
+        >
           <div class="flex items-center gap-4 mb-4">
             <span
               class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider"
@@ -302,14 +321,16 @@ const formatDate = (ts: Timestamp) => {
             </span>
             <span class="text-gray-400 text-sm"> 建立於：{{ formatDate(project.createdAt) }} </span>
           </div>
-          <h1 class="text-4xl font-extrabold text-gray-800 tracking-tight">
+          <h1 class="text-4xl font-extrabold text-gray-800 dark:text-gray-100 tracking-tight">
             {{ project.name }}
           </h1>
         </div>
 
         <div class="p-8 space-y-8">
           <div>
-            <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            <h3
+              class="text-sm font-semibold text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-3"
+            >
               使用技術 Stack
             </h3>
             <div class="flex flex-wrap gap-2">
@@ -324,16 +345,22 @@ const formatDate = (ts: Timestamp) => {
           </div>
 
           <div>
-            <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            <h3
+              class="text-sm font-semibold text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-3"
+            >
               專案描述 Description
             </h3>
-            <div class="prose max-w-none text-gray-600 leading-relaxed whitespace-pre-wrap">
+            <div
+              class="prose max-w-none text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap"
+            >
               {{ project.description || '此專案尚無詳細描述...' }}
             </div>
           </div>
 
           <div>
-            <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            <h3
+              class="text-sm font-semibold text-gray-400 dark:text-gray-200 uppercase tracking-wider mb-3"
+            >
               專案截圖 Screenshots
             </h3>
             <div
@@ -343,22 +370,23 @@ const formatDate = (ts: Timestamp) => {
               <div
                 v-for="(imgUrl, index) in project.screenshots"
                 :key="index"
-                class="group relative rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition"
+                class="group relative rounded-xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition"
               >
                 <a
                   :href="imgUrl"
                   target="_blank"
-                  class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer hover:bg-gray-200 p-1 rounded transition"
+                  class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 p-1 rounded transition"
                   title="點擊預覽圖片"
                 >
                   <img
                     :src="imgUrl"
                     @error="handleImgError"
-                    class="w-8 h-8 object-cover rounded border bg-white"
+                    class="w-8 h-8 object-cover rounded border bg-white dark:bg-gray-800"
                   />
-                  <span class="truncate text-blue-600 underline decoration-blue-300">{{
-                    imgUrl
-                  }}</span>
+                  <span
+                    class="truncate text-blue-600 dark:text-blue-300 underline decoration-blue-300"
+                    >{{ imgUrl }}</span
+                  >
                 </a>
               </div>
             </div>

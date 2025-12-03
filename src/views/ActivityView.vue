@@ -97,10 +97,12 @@ const chartOptions: ChartOptions<'bar'> = {
   <div class="p-6 space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-800">活動即時監控</h1>
-        <p class="text-gray-500 mt-1">即時同步 LINE 用戶的簽到狀況。</p>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">活動即時監控</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-1">即時同步 LINE 用戶的簽到狀況。</p>
       </div>
-      <div class="bg-indigo-50 text-indigo-700 px-4 py-2 rounded-lg font-medium">
+      <div
+        class="bg-indigo-50 text-indigo-700 dark:text-indigo-300 px-4 py-2 rounded-lg font-medium"
+      >
         目前人數：{{ attendees.length }} 人
       </div>
     </div>
@@ -108,7 +110,7 @@ const chartOptions: ChartOptions<'bar'> = {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <BaseChart :chart-data="chartData" :chart-options="chartOptions" />
       <div
-        class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg p-6 text-white shadow-md flex flex-col justify-between"
+        class="bg-gradient-to-br from-green-500 to-emerald-600 dark:from-green-700 dark:to-emerald-800 rounded-lg p-6 text-white shadow-md flex flex-col justify-between dark:text-gray-100"
       >
         <div>
           <h3 class="text-lg font-medium opacity-90">最新簽到</h3>
@@ -126,14 +128,14 @@ const chartOptions: ChartOptions<'bar'> = {
           <img
             v-if="row.pictureUrl"
             :src="row.pictureUrl"
-            class="w-10 h-10 rounded-full border border-gray-200 object-cover transition-all duration-300"
+            class="w-10 h-10 rounded-full border border-gray-200 dark:border-gray-600 object-cover transition-all duration-300"
             :class="{ 'blur-[3px]': authStore.isObserver }"
             alt="Avatar"
             title="個資已受保護 (觀察者模式)"
           />
           <div
             v-else
-            class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"
+            class="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300"
           >
             ?
           </div>
@@ -141,19 +143,21 @@ const chartOptions: ChartOptions<'bar'> = {
       </template>
 
       <template #cell-displayName="{ row }">
-        <span :class="{ 'text-gray-500 italic': authStore.isObserver }">
+        <span :class="{ 'text-gray-500 dark:text-gray-300 italic': authStore.isObserver }">
           {{ maskName(row.displayName) }}
         </span>
       </template>
 
       <template #cell-status="{ row }">
-        <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+        <span
+          class="px-3 py-1 rounded-full te xt-xs font-medium bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+        >
           {{ row.status }}
         </span>
       </template>
 
       <template #cell-checkInTime="{ row }">
-        <span class="text-gray-500 font-mono text-sm">
+        <span class="text-gray-500 dark:text-gray-300 font-mono text-sm">
           {{ formatDate(row.checkInTime) }}
         </span>
       </template>
