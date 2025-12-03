@@ -25,7 +25,10 @@ const editForm = ref({
   tech: '',
   status: 'Active',
   description: '',
+  screenshots: [] as string[],
 })
+
+const tempImageUrl = ref('')
 
 onMounted(async () => {
   try {
@@ -53,8 +56,25 @@ const startEdit = () => {
     tech: project.value.tech,
     status: project.value.status,
     description: project.value.description || '',
+    screenshots: project.value.screenshots || [],
   }
+  tempImageUrl.value = ''
   isEditing.value = true
+}
+
+const addScreenshot = () => {
+  if (!tempImageUrl.value.trim()) return
+  editForm.value.screenshots.push(tempImageUrl.value.trim())
+  tempImageUrl.value = ''
+}
+
+const removeScreenshot = (index: number) => {
+  editForm.value.screenshots.splice(index, 1)
+}
+
+const handleImgError = (e: Event) => {
+  const target = e.target as HTMLImageElement
+  target.style.display = 'none'
 }
 
 // 儲存修改
@@ -71,6 +91,7 @@ const handleUpdate = async () => {
       tech: editForm.value.tech,
       status: editForm.value.status,
       description: editForm.value.description,
+      screenshots: editForm.value.screenshots,
     })
 
     // 更新本地顯示資料
@@ -145,7 +166,6 @@ const formatDate = (ts: Timestamp) => {
               {{ isDeleting ? '刪除中...' : '🗑️ 刪除' }}
             </button>
           </template>
-
           <template v-else>
             <button
               @click="isEditing = false"
@@ -211,6 +231,60 @@ const formatDate = (ts: Timestamp) => {
             placeholder="請輸入詳細描述..."
           ></textarea>
         </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1"
+            >專案截圖連結 (Imgur 網址)</label
+          >
+
+          <div class="flex gap-2 mb-2">
+            <input
+              v-model="tempImageUrl"
+              type="url"
+              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="貼上圖片網址 (https://i.imgur.com/...)"
+              @keypress.enter.prevent="addScreenshot"
+            />
+            <button
+              type="button"
+              @click="addScreenshot"
+              class="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg hover:bg-gray-200"
+            >
+              新增
+            </button>
+          </div>
+
+          <div v-if="editForm.screenshots.length > 0" class="space-y-2">
+            <div
+              v-for="(url, index) in editForm.screenshots"
+              :key="index"
+              class="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-100 text-sm"
+            >
+              <a
+                :href="url"
+                target="_blank"
+                class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer hover:bg-gray-200 p-1 rounded transition"
+                title="點擊預覽圖片"
+              >
+                <img
+                  :src="url"
+                  @error="handleImgError"
+                  class="w-8 h-8 object-cover rounded border bg-white"
+                />
+                <span class="truncate text-blue-600 underline decoration-blue-300">{{ url }}</span>
+              </a>
+
+              <button
+                type="button"
+                @click="removeScreenshot(index)"
+                class="text-red-500 hover:text-red-700 px-3 py-1 hover:bg-red-50 rounded ml-2 transition"
+                title="移除此圖片"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div v-else class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
@@ -255,6 +329,44 @@ const formatDate = (ts: Timestamp) => {
             </h3>
             <div class="prose max-w-none text-gray-600 leading-relaxed whitespace-pre-wrap">
               {{ project.description || '此專案尚無詳細描述...' }}
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+              專案截圖 Screenshots
+            </h3>
+            <div
+              v-if="project.screenshots && project.screenshots.length > 0"
+              class="grid grid-cols-1 md:grid-cols-2 gap-6"
+            >
+              <div
+                v-for="(imgUrl, index) in project.screenshots"
+                :key="index"
+                class="group relative rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition"
+              >
+                <a
+                  :href="imgUrl"
+                  target="_blank"
+                  class="flex items-center gap-2 overflow-hidden flex-1 cursor-pointer hover:bg-gray-200 p-1 rounded transition"
+                  title="點擊預覽圖片"
+                >
+                  <img
+                    :src="imgUrl"
+                    @error="handleImgError"
+                    class="w-8 h-8 object-cover rounded border bg-white"
+                  />
+                  <span class="truncate text-blue-600 underline decoration-blue-300">{{
+                    imgUrl
+                  }}</span>
+                </a>
+              </div>
+            </div>
+            <div
+              v-else
+              class="bg-gray-50 rounded-lg p-6 text-center border border-dashed border-gray-300"
+            >
+              <span class="text-gray-400">此專案尚未上傳截圖</span>
             </div>
           </div>
         </div>

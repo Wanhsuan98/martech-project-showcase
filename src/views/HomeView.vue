@@ -17,6 +17,8 @@ interface Project {
   name: string
   status: 'Active' | 'Completed' | 'Pending'
   tech: string
+  screenshots?: string[]
+  description?: string
   createdAt?: any
 }
 
@@ -35,12 +37,24 @@ const form = ref({
   name: '',
   tech: '',
   status: 'Active' as const,
+  screenshots: [] as string[],
+  description: '',
 })
 
-// 即時讀取 Firebase 資料
+const tempImageUrl = ref('')
+
+const addScreenshot = () => {
+  if (!tempImageUrl.value.trim()) return
+  form.value.screenshots.push(tempImageUrl.value.trim())
+  tempImageUrl.value = ''
+}
+
+const removeScreenshot = (index: number) => {
+  form.value.screenshots.splice(index, 1)
+}
+
 onMounted(() => {
   const q = query(collection(db, 'projects'), orderBy('createdAt', 'desc'))
-
   onSnapshot(q, (snapshot) => {
     projects.value = snapshot.docs.map(
       (doc) =>
@@ -52,7 +66,6 @@ onMounted(() => {
   })
 })
 
-// --- 專案邏輯 ---
 const handleAddProject = async () => {
   if (!form.value.name || !form.value.tech) return alert('請填寫完整資訊')
 
@@ -62,20 +75,23 @@ const handleAddProject = async () => {
       name: form.value.name,
       tech: form.value.tech,
       status: form.value.status,
+      screenshots: form.value.screenshots,
+      description: form.value.description,
       createdAt: serverTimestamp(),
     })
 
     isModalOpen.value = false
-    form.value = { name: '', tech: '', status: 'Active' }
+    // 重置表單
+    form.value = { name: '', tech: '', status: 'Active', screenshots: [], description: '' }
+    tempImageUrl.value = ''
   } catch (error) {
     console.error('新增失敗', error)
-    alert('新增失敗，權限不足或是網路錯誤')
+    alert('新增失敗')
   } finally {
     isSubmitting.value = false
   }
 }
 
-// 圖表資料
 const chartData = computed<ChartData<'bar'>>(() => {
   const active = projects.value.filter((p) => p.status === 'Active').length
   const completed = projects.value.filter((p) => p.status === 'Completed').length
@@ -140,7 +156,6 @@ const chartOptions: ChartOptions<'bar'> = {
           {{ row.name }}
         </RouterLink>
       </template>
-
       <template #cell-status="{ row }">
         <span
           class="px-3 py-1 rounded-full text-xs font-medium"
@@ -163,31 +178,82 @@ const chartOptions: ChartOptions<'bar'> = {
             v-model="form.name"
             type="text"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            placeholder="例如：企業形象官網"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder="例如：後台管理系統"
           />
         </div>
+
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">使用技術</label>
           <input
             v-model="form.tech"
             type="text"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
             placeholder="例如：Vue3, Tailwind"
           />
         </div>
+
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">目前狀態</label>
           <select
             v-model="form.status"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
           >
             <option value="Active">進行中 (Active)</option>
             <option value="Pending">排程中 (Pending)</option>
             <option value="Completed">已完成 (Completed)</option>
           </select>
         </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">專案描述</label>
+          <textarea
+            v-model="form.description"
+            rows="4"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
+            placeholder="請輸入專案詳細介紹、亮點功能..."
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">專案截圖連結 (可多張)</label>
+
+          <div class="flex gap-2 mb-2">
+            <input
+              v-model="tempImageUrl"
+              type="url"
+              class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="https://imgur.com/..."
+              @keypress.enter.prevent="addScreenshot"
+            />
+            <button
+              type="button"
+              @click="addScreenshot"
+              class="bg-gray-100 text-gray-600 px-3 py-2 rounded-lg hover:bg-gray-200"
+            >
+              新增
+            </button>
+          </div>
+
+          <div v-if="form.screenshots.length > 0" class="space-y-2">
+            <div
+              v-for="(url, index) in form.screenshots"
+              :key="index"
+              class="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-100 text-sm"
+            >
+              <span class="truncate flex-1 text-gray-600 mr-2">{{ url }}</span>
+              <button
+                type="button"
+                @click="removeScreenshot(index)"
+                class="text-red-500 hover:text-red-700"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div class="flex justify-end gap-3 mt-6">
           <button
             type="button"
