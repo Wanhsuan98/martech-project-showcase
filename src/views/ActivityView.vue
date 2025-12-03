@@ -2,38 +2,35 @@
 import { ref, computed, onMounted } from 'vue'
 import { collection, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore'
 import { db } from '@/firebase'
+import { useAuthStore } from '@/stores/auth'
 import BaseTable from '@/components/BaseTable.vue'
 import BaseChart from '@/components/BaseChart.vue'
 import type { Column } from '@/types/table'
 import type { ChartData, ChartOptions } from 'chart.js'
 
-// 1. 定義新的資料介面 (對應 LIFF 寫入的欄位)
+const authStore = useAuthStore()
+
+// 定義資料介面
 interface Attendee {
   id: string
   userId: string
   displayName: string
   pictureUrl: string
   status: string
-  checkInTime: Timestamp | null // Firebase 的時間格式
+  checkInTime: Timestamp | null
 }
 
-// 2. 更新表格欄位設定
 const tableColumns: Column<Attendee>[] = [
-  { key: 'pictureUrl', label: '用戶', slot: true, width: '80px', align: 'center' }, // 頭貼
-  { key: 'displayName', label: '暱稱' },
+  { key: 'pictureUrl', label: '用戶', slot: true, width: '80px', align: 'center' },
+  { key: 'displayName', label: '暱稱', slot: true },
   { key: 'status', label: '狀態', slot: true, align: 'center' },
-  { key: 'checkInTime', label: '簽到時間', slot: true, align: 'right' }, // 時間需要格式化
+  { key: 'checkInTime', label: '簽到時間', slot: true, align: 'right' },
 ]
 
 const attendees = ref<Attendee[]>([])
 
-// 3. 改用 onSnapshot 實現「即時監聽」 (Real-time Listener)
-// 只要有人在手機上簽到，這裡的程式碼會自動觸發，不用重新整理網頁！
 onMounted(() => {
-  // 建立查詢：抓取 attendees 集合，並依照簽到時間倒序排列 (最新的在上面)
   const q = query(collection(db, 'attendees'), orderBy('checkInTime', 'desc'))
-
-  // 開啟監聽器
   onSnapshot(q, (snapshot) => {
     const tempAttendees: Attendee[] = []
     snapshot.forEach((doc) => {
@@ -43,14 +40,13 @@ onMounted(() => {
       } as Attendee)
     })
     attendees.value = tempAttendees
-    console.log('📦 後台收到最新簽到資料:', tempAttendees)
   })
 })
 
-// 4. 工具函式：把 Firebase Timestamp 轉成好看的時間字串
+// 時間格式化
 const formatDate = (ts: Timestamp | null) => {
   if (!ts) return '-'
-  const date = ts.toDate() // 轉成 JS Date 物件
+  const date = ts.toDate()
   return date.toLocaleString('zh-TW', {
     hour12: false,
     month: '2-digit',
@@ -61,19 +57,27 @@ const formatDate = (ts: Timestamp | null) => {
   })
 }
 
-// --- 圖表邏輯 (統計簽到人數) ---
+// 名字模糊處理函式
+const maskName = (name: string) => {
+  if (authStore.isAdmin) return name
+  if (authStore.isObserver) {
+    if (!name) return '***'
+    if (name.length <= 2) return name[0] + '*'
+    return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1]
+  }
+  return name
+}
+
+// 圖表資料
 const chartData = computed<ChartData<'bar'>>(() => {
-  // 這裡我們簡單統計一下「已簽到」的人數
-  // 為了讓圖表豐富一點，我們假裝有一個目標人數 (例如 10 人)
   const checkedInCount = attendees.value.length
   const targetCount = 10
-
   return {
     labels: ['已簽到人數', '目標人數'],
     datasets: [
       {
         label: '活動參與狀況',
-        backgroundColor: ['#10b981', '#cbd5e1'], // 綠色 vs 灰色
+        backgroundColor: ['#10b981', '#cbd5e1'],
         data: [checkedInCount, targetCount],
         borderRadius: 4,
         barThickness: 50,
@@ -103,14 +107,13 @@ const chartOptions: ChartOptions<'bar'> = {
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <BaseChart :chart-data="chartData" :chart-options="chartOptions" />
-
       <div
         class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg p-6 text-white shadow-md flex flex-col justify-between"
       >
         <div>
           <h3 class="text-lg font-medium opacity-90">最新簽到</h3>
           <p class="text-3xl font-bold mt-2 truncate">
-            {{ attendees[0]?.displayName || '尚無人簽到' }}
+            {{ attendees[0] ? maskName(attendees[0].displayName) : '尚無人簽到' }}
           </p>
         </div>
         <div class="text-sm opacity-75">系統運作正常</div>
@@ -123,8 +126,10 @@ const chartOptions: ChartOptions<'bar'> = {
           <img
             v-if="row.pictureUrl"
             :src="row.pictureUrl"
-            class="w-10 h-10 rounded-full border border-gray-200 object-cover"
+            class="w-10 h-10 rounded-full border border-gray-200 object-cover transition-all duration-300"
+            :class="{ 'blur-[3px]': authStore.isObserver }"
             alt="Avatar"
+            title="個資已受保護 (觀察者模式)"
           />
           <div
             v-else
@@ -133,6 +138,12 @@ const chartOptions: ChartOptions<'bar'> = {
             ?
           </div>
         </div>
+      </template>
+
+      <template #cell-displayName="{ row }">
+        <span :class="{ 'text-gray-500 italic': authStore.isObserver }">
+          {{ maskName(row.displayName) }}
+        </span>
       </template>
 
       <template #cell-status="{ row }">

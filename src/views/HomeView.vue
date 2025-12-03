@@ -2,11 +2,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '@/firebase'
-
+import { useAuthStore } from '@/stores/auth'
 import BaseTable from '@/components/BaseTable.vue'
 import BaseChart from '@/components/BaseChart.vue'
 import type { Column } from '@/types/table'
 import type { ChartData, ChartOptions } from 'chart.js'
+
+const authStore = useAuthStore()
 
 interface Project {
   id: string
@@ -89,6 +91,7 @@ const chartOptions: ChartOptions<'bar'> = {
       </div>
       <button
         class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition shadow-sm"
+        v-if="authStore.isAdmin"
       >
         新增專案
       </button>
