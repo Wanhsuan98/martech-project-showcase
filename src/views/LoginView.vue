@@ -18,7 +18,8 @@ const handleLogin = async () => {
   try {
     await authStore.login(email.value, password.value)
     router.push('/')
-  } catch (error) {
+  } catch (error: any) {
+    alert(`登入錯誤:\nCode: ${error.code}\nMessage: ${error.message}`)
     console.error('登入失敗:', error)
   } finally {
     isLoading.value = false

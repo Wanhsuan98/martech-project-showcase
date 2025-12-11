@@ -53,7 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
       await signInWithEmailAndPassword(auth, email, pass)
     } catch (error: unknown) {
       console.error('登入失敗:', error)
-      throw new Error('帳號或密碼錯誤')
+      throw error
     }
   }
 
