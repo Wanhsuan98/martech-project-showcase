@@ -4,8 +4,7 @@ import { RouterView } from 'vue-router'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 
-// 控制側邊欄狀態
-const isSidebarOpen = ref(false)
+const isSidebarOpen = ref(window.innerWidth >= 768)
 </script>
 
 <template>
@@ -14,7 +13,7 @@ const isSidebarOpen = ref(false)
 
     <AppSidebar :is-open="isSidebarOpen" @close="isSidebarOpen = false" />
 
-    <main class="layout-main">
+    <main class="layout-main" :class="isSidebarOpen ? 'md:pl-64' : 'pl-0'">
       <AppHeader @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 
       <div class="layout-content">
