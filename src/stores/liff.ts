@@ -71,12 +71,6 @@ export const useLiffStore = defineStore('liff', () => {
   }
 
   const sendMessage = async (text: string) => {
-    const context = liff.getContext()
-    const contextType = context?.type
-
-    alert(
-      `診斷報告:\nInClient: ${liff.isInClient()}\nContext: ${contextType}\nViewType: ${context?.viewType}`,
-    )
     // 1. 檢查是否在 LINE App 內 (外部瀏覽器不支援 sendMessages)
     if (!liff.isInClient()) {
       console.warn('liff.sendMessages 僅支援 LINE App 內建瀏覽器')
@@ -91,12 +85,10 @@ export const useLiffStore = defineStore('liff', () => {
           text: text,
         },
       ])
-      alert('系統回傳發送成功！請檢查聊天室')
       console.log('訊息發送成功')
       return true
-    } catch (error: any) {
+    } catch (error) {
       console.error('訊息發送失敗:', error)
-      alert(`發送失敗:\nCode: ${error.code}\nMsg: ${error.message}`)
       throw error
     }
   }
