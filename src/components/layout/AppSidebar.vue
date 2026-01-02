@@ -26,29 +26,35 @@ const getLinkClass = (path: string) => {
     <div class="layout-sidebar-header flex items-center justify-between px-6">
       <div class="flex items-center gap-2">
         <div class="sidebar-logo-container">
-          <span class="text-white font-bold text-lg">F</span>
+          <span class="text-white font-bold text-lg">J</span>
         </div>
-        <span class="text-lg font-bold tracking-wide text-slate-100">Frontend Hub</span>
+        <span class="text-lg font-bold tracking-wide text-slate-100"
+          >Jenny Lin . <span class="text-indigo-600 dark:text-indigo-400"> Dev</span></span
+        >
       </div>
     </div>
 
-    <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-8">
+    <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-6">
       <div class="space-y-1">
-        <div class="nav-label">管理核心</div>
+        <div class="nav-label">個人品牌</div>
 
         <RouterLink to="/" @click="emit('close')" :class="getLinkClass('/')">
-          <LayoutDashboard class="w-5 h-5" />
-          <span class="font-medium">專案總覽</span>
-        </RouterLink>
-
-        <RouterLink to="/about" @click="emit('close')" :class="getLinkClass('/about')">
           <User class="w-5 h-5" />
           <span class="font-medium">個人履歷</span>
         </RouterLink>
       </div>
 
-      <div class="space-y-1">
-        <div class="nav-label flex items-center gap-2">
+      <div v-if="authStore.user" class="space-y-1">
+        <div class="nav-label mt-2">後台管理</div>
+
+        <RouterLink to="/dashboard" @click="emit('close')" :class="getLinkClass('/dashboard')">
+          <LayoutDashboard class="w-5 h-5" />
+          <span class="font-medium">專案總覽</span>
+        </RouterLink>
+      </div>
+
+      <div v-if="authStore.user" class="space-y-1">
+        <div class="nav-label flex items-center gap-2 mt-2">
           實驗室
           <span class="badge-demo">Demo</span>
         </div>
@@ -78,6 +84,7 @@ const getLinkClass = (path: string) => {
           <span class="text-[10px] text-slate-600">v1.0.0 Dev</span>
         </div>
         <button
+          v-if="authStore.user"
           @click="authStore.logout"
           class="flex items-center gap-2 px-2 py-1.5 text-xs font-medium btn-danger"
         >

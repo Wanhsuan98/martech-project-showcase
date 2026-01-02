@@ -18,7 +18,7 @@ const handleLogin = async () => {
 
   try {
     await authStore.login(email.value, password.value)
-    router.push('/')
+    router.push({ name: 'dashboard' })
   } catch (error) {
     console.error('登入失敗:', error)
     if (error instanceof FirebaseError) {
