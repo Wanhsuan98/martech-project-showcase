@@ -20,27 +20,49 @@ const handleLogin = async () => {
     await authStore.login(email.value, password.value)
     router.push({ name: 'dashboard' })
   } catch (error) {
-    console.error('登入失敗:', error)
-    if (error instanceof FirebaseError) {
-      switch (error.code) {
-        case 'auth/invalid-credential':
-        case 'auth/user-not-found':
-        case 'auth/wrong-password':
-          errorMsg.value = '帳號或密碼錯誤'
-          break
-        case 'auth/too-many-requests':
-          errorMsg.value = '登入失敗次數過多，請稍後再試'
-          break
-        default:
-          errorMsg.value = `登入失敗 (${error.code})`
-      }
-    } else if (error instanceof Error) {
-      errorMsg.value = error.message
-    } else {
-      errorMsg.value = '發生未知錯誤'
-    }
+    handleAuthError(error)
   } finally {
     isLoading.value = false
+  }
+}
+
+const handleDemoLogin = async () => {
+  isLoading.value = true
+  errorMsg.value = ''
+
+  // 這裡填入你在 Firebase 建立的 Demo 帳號
+  const demoEmail = import.meta.env.VITE_DEMO_EMAIL
+  const demoPwd = import.meta.env.VITE_DEMO_PASSWORD
+
+  try {
+    await authStore.login(demoEmail, demoPwd)
+    router.push({ name: 'dashboard' })
+  } catch (error) {
+    handleAuthError(error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const handleAuthError = (error: unknown) => {
+  console.error('登入失敗:', error)
+  if (error instanceof FirebaseError) {
+    switch (error.code) {
+      case 'auth/invalid-credential':
+      case 'auth/user-not-found':
+      case 'auth/wrong-password':
+        errorMsg.value = '帳號或密碼錯誤'
+        break
+      case 'auth/too-many-requests':
+        errorMsg.value = '登入失敗次數過多，請稍後再試'
+        break
+      default:
+        errorMsg.value = `登入失敗 (${error.code})`
+    }
+  } else if (error instanceof Error) {
+    errorMsg.value = error.message
+  } else {
+    errorMsg.value = '發生未知錯誤'
   }
 }
 </script>
@@ -80,16 +102,34 @@ const handleLogin = async () => {
           {{ errorMsg }}
         </div>
 
-        <button
-          type="submit"
-          :disabled="isLoading"
-          class="btn-primary w-full py-2.5 font-semibold text-lg shadow-md"
-        >
-          <span v-if="isLoading" class="flex items-center justify-center gap-2">
-            <span class="animate-spin">⚪</span> 登入中...
-          </span>
-          <span v-else>登入</span>
-        </button>
+        <div class="space-y-3">
+          <button
+            type="submit"
+            :disabled="isLoading"
+            class="btn-primary w-full py-2.5 font-semibold text-lg shadow-md"
+          >
+            <span v-if="isLoading" class="flex items-center justify-center gap-2">
+              <span class="animate-spin">⚪</span> 登入中...
+            </span>
+            <span v-else>登入</span>
+          </button>
+
+          <div class="relative flex py-2 items-center">
+            <div class="divider-line"></div>
+            <span class="text-meta mx-4">或</span>
+            <div class="divider-line"></div>
+          </div>
+
+          <button
+            type="button"
+            @click="handleDemoLogin"
+            :disabled="isLoading"
+            class="btn-demo-login"
+          >
+            <UserCheck class="w-5 h-5" />
+            Demo 帳號一鍵登入
+          </button>
+        </div>
       </form>
     </div>
   </div>
