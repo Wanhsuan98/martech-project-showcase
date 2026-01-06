@@ -72,7 +72,7 @@ const handleDelete = async () => {
   <div class="p-6 max-w-5xl mx-auto space-y-6 animate-in">
     <div class="flex items-center justify-between">
       <button
-        @click="router.push('/')"
+        @click="router.push('/dashboard')"
         class="flex items-center gap-1 text-slate-500 hover:text-primary-600 transition-colors"
       >
         <ChevronLeft class="w-4 h-4" />
@@ -92,7 +92,7 @@ const handleDelete = async () => {
     <BaseLoading v-if="isLoading" message="正在取得專案詳情資料..." />
     <div v-else-if="errorMsg" class="card p-12 text-center">
       <div class="text-red-500 text-lg mb-4">{{ errorMsg }}</div>
-      <button @click="router.push('/')" class="btn btn-primary">回到列表</button>
+      <button @click="router.push('/dashboard')" class="btn btn-primary">回到列表</button>
     </div>
 
     <template v-else>
