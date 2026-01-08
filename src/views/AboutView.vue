@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useProfile } from '@/composables/useProfile'
+import { useProjects } from '@/composables/useProjects'
 import BaseRadarChart from '@/components/BaseRadarChart.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import BaseLoading from '@/components/BaseLoading.vue'
-// 引入需要的 Icons
+import type { Project } from '@/types/project'
 import {
   Github,
   Linkedin,
@@ -19,28 +20,79 @@ import {
 import type { ChartData, ChartOptions } from 'chart.js'
 
 const { profile, loading, fetchProfile } = useProfile()
+const { projects, initProjectsListener } = useProjects()
 
 onMounted(() => {
   fetchProfile()
+  initProjectsListener()
 })
 
-// TODO: 這裡的資料未來也可以考慮放進 Firebase
-const techHighlights = [
-  {
-    label: 'Tech Stack',
-    content: 'Vue 3, TypeScript, Vite, Tailwind CSS',
-    icon: Cpu,
-    color: 'text-indigo-500',
-    bg: 'bg-indigo-50 dark:bg-indigo-500/10',
-  },
-  {
-    label: 'Deployment & Tools',
-    content: 'Firebase, Vercel, Git, Figma',
-    icon: Globe,
-    color: 'text-emerald-500',
-    bg: 'bg-emerald-50 dark:bg-emerald-500/10',
-  },
-]
+const techHighlights = computed(() => {
+  // 預設
+  const defaultFrontend = ['Vue 3, TypeScript, Vite, Tailwind CSS']
+  const defaultBackend = ['Firebase, Vercel, Git']
+
+  if (projects.value.length === 0) {
+    return [
+      {
+        label: 'Tech Stack',
+        tags: defaultFrontend,
+        icon: Cpu,
+        color: 'text-indigo-500',
+        bg: 'bg-indigo-50 dark:bg-indigo-500/10',
+        tagBg: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300',
+      },
+      {
+        label: 'Deployment & Tools',
+        tags: defaultBackend,
+        icon: Globe,
+        color: 'text-emerald-500',
+        bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+        tagBg: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300',
+      },
+    ]
+  }
+
+  // --- 輔助函式：提取並去重 ---
+  const getUniqueTags = (fields: (keyof Project)[]) => {
+    const tags = new Set<string>()
+    projects.value.forEach((p) => {
+      fields.forEach((key) => {
+        const val = p[key]
+        if (typeof val === 'string' && val) {
+          val.split(/[,、]/).forEach((t) => {
+            const cleanTag = t.trim()
+            if (cleanTag) tags.add(cleanTag)
+          })
+        }
+      })
+    })
+    return Array.from(tags)
+  }
+
+  const frontendTags = getUniqueTags(['techFrontend', 'techCore'])
+
+  const backendTags = getUniqueTags(['techDeployment', 'techDatabase'])
+
+  return [
+    {
+      label: 'Tech Stack',
+      tags: frontendTags.length ? frontendTags : defaultFrontend, // 使用陣列
+      icon: Cpu,
+      color: 'text-indigo-500',
+      bg: 'bg-indigo-50 dark:bg-indigo-500/10',
+      tagBg: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300',
+    },
+    {
+      label: 'Deployment & Tools',
+      tags: backendTags.length ? backendTags : defaultBackend,
+      icon: Globe,
+      color: 'text-emerald-500',
+      bg: 'bg-emerald-50 dark:bg-emerald-500/10',
+      tagBg: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300',
+    },
+  ]
+})
 
 const socialLinks = [
   {
@@ -191,9 +243,16 @@ const skillOptions: ChartOptions<'radar'> = {
                     <p class="tech-category-label mb-2">
                       {{ tech.label }}
                     </p>
-                    <p class="text-sm tech-content-text">
-                      {{ tech.content }}
-                    </p>
+                    <div class="flex flex-wrap gap-2">
+                      <span
+                        v-for="tag in tech.tags"
+                        :key="tag"
+                        class="px-2.5 py-1 text-xs font-medium rounded-md transition-colors"
+                        :class="tech.tagBg"
+                      >
+                        {{ tag }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
